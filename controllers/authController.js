@@ -106,3 +106,5 @@ exports.restrictTo = (...roles) => {
     next();
   };
 };
+
+exports.forgetPassword = (req, res, next) => {};

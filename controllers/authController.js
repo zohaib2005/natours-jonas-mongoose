@@ -14,17 +14,17 @@ const createSendToken = (user, statusCode, res) => {
     secure: true,
     httpOnly: true,
   };
-};
 
-if (process.env.NODE_ENV === 'production') cookieOptions.secure = true;
-res.cookie('jwt', token, cookieOptions);
+  if (process.env.NODE_ENV === 'production') cookieOptions.secure = true;
+  res.cookie('jwt', token, cookieOptions);
 
-user.password = undefined;
+  user.password = undefined;
 
-const signToken = (id) => {
-  return jwt.sign({ id: id }, process.env.JWT_SECRET, {
-    expiresIn: process.env.JWT_EXPIRES_IN,
-  });
+  const signToken = (id) => {
+    return jwt.sign({ id: id }, process.env.JWT_SECRET, {
+      expiresIn: process.env.JWT_EXPIRES_IN,
+    });
+  };
 };
 
 exports.signup = catchAsync(async (req, res, next) => {

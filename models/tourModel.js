@@ -55,6 +55,8 @@ const tourSchema = new mongoose.Schema(
     },
     summary: {
       type: String,
+      // removes all whitespaces from beginning and end
+      // trim only works with strings
       trim: true,
       required: [true, 'A tour must have a description'],
     },

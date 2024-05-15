@@ -40,14 +40,34 @@ class APIFeatures {
     return this;
   }
 
+  // 4 Pagination
   paginate() {
+    try {
+       // below we are multiplying page by 1 to convery if page is string to number
+    // by multiplying any string by 1 converts string to number
     const page = this.queryString.page * 1 || 1;
     const limit = this.queryString.limit * 1 || 100;
     const skip = (page - 1) * limit;
 
     this.query = this.query.skip(skip).limit(limit);
+    
+    if(req.query.page) {
+      const numTours = await Tour.countDocumets();
+      if(skip >= numTours) throw new Error('This page does not exist!')
+    }
 
+    // EXECUTE QUERY
+    // const tours = await query;
     return this;
+    }
+   
+    catch(err) {
+    res.status(404).json({
+      status: 'fail',
+      message: err,
+    });
+  
+    }
   }
 }
 module.exports = APIFeatures;

@@ -167,13 +167,30 @@ exports.deleteTour = catchAsync(async (req, res, next) => {
   });
 });
 
+// ? AGGREGATION Pipeline
+// * Pipeline from where all documents go through where they are processed step by step in order to transform them into aggregated results.
+// * i.e i) Calculate averages, Calculate min & max values, Calculate distances
 exports.getTourStats = catchAsync(async (req, res, next) => {
+  // * We pass array of stages to aggregate
+  // * document then pass through these stages one by one step by step in the defined sequence
+
+  // ? DOCUMENTATION
+  // ? https://www.mongodb.com/docs/manual/reference/operator/aggregation-pipeline/
+
+  // * Like Tour.find returns query object same as Tour.aggregate returns aggregate object so we need to await it
   const stats = await Tour.aggregate([
     {
+      // * match is used to select or filter certain documents
+      // * ratings average should be greater than 4.5
       $match: { ratingsAverage: { $gte: 4.5 } },
     },
     {
+      // * it allows us to group documents together basically using accumulator, an accumulator is i.e calculate average
+      // * if we have 5 tours each have rating then we can calculate average rating using group
       $group: {
+        // * we always specify id which tells on what we want to groupBy
+        // * we can do _id: null then it will calculate rating of all tours without difficulty level
+        // * By Specifying _id: $difficulty it calculates average of each group by difficulty easy, medium and hard
         _id: { $toUpper: '$difficulty' },
         numTours: { $sum: 1 },
         numRatings: { $sum: '$ratingsQuantity' },

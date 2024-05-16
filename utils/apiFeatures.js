@@ -15,7 +15,7 @@ class APIFeatures {
 
     this.query = this.query.find(JSON.parse(queryStr));
 
-     // return this means return entire object
+    // return this means return entire object
     return this;
   }
 
@@ -39,38 +39,35 @@ class APIFeatures {
       this.query = this.query.select('-__v');
     }
 
-     // return this means return entire object
+    // return this means return entire object
     return this;
   }
 
   // 4 Pagination
-  paginate() {
+  async paginate() {
     try {
-       // below we are multiplying page by 1 to convery if page is string to number
-    // by multiplying any string by 1 converts string to number
-    const page = this.queryString.page * 1 || 1;
-    const limit = this.queryString.limit * 1 || 100;
-    const skip = (page - 1) * limit;
+      // below we are multiplying page by 1 to convery if page is string to number
+      // by multiplying any string by 1 converts string to number
+      const page = this.queryString.page * 1 || 1;
+      const limit = this.queryString.limit * 1 || 100;
+      const skip = (page - 1) * limit;
 
-    this.query = this.query.skip(skip).limit(limit);
-    
-    if(req.query.page) {
-      const numTours = await Tour.countDocumets();
-      if(skip >= numTours) throw new Error('This page does not exist!')
-    }
+      this.query = this.query.skip(skip).limit(limit);
 
-    // EXECUTE QUERY
-    // const tours = await query;
-     // return this means return entire object
-    return this;
-    }
-   
-    catch(err) {
-    res.status(404).json({
-      status: 'fail',
-      message: err,
-    });
-  
+      if (req.query.page) {
+        const numTours = await Tour.countDocumets();
+        if (skip >= numTours) throw new Error('This page does not exist!');
+      }
+
+      // EXECUTE QUERY
+      // const tours = await query;
+      // return this means return entire object
+      return this;
+    } catch (err) {
+      res.status(404).json({
+        status: 'fail',
+        message: err,
+      });
     }
   }
 }

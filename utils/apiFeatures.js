@@ -15,6 +15,7 @@ class APIFeatures {
 
     this.query = this.query.find(JSON.parse(queryStr));
 
+     // return this means return entire object
     return this;
   }
 
@@ -26,6 +27,7 @@ class APIFeatures {
       this.query = this.query.sort('-createdAt');
     }
 
+    // return this means return entire object
     return this;
   }
 
@@ -37,6 +39,7 @@ class APIFeatures {
       this.query = this.query.select('-__v');
     }
 
+     // return this means return entire object
     return this;
   }
 
@@ -58,6 +61,7 @@ class APIFeatures {
 
     // EXECUTE QUERY
     // const tours = await query;
+     // return this means return entire object
     return this;
     }
    

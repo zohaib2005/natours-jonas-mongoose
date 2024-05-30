@@ -30,6 +30,7 @@ const userSchema = new mongoose.Schema({
   confirmPassword: {
     type: String,
     required: [true, 'Please confirm your password'],
+    // we need to use this that's why we are using simple function instead of arrow function
     validate: {
       validator: function (el) {
         return el === this.password;

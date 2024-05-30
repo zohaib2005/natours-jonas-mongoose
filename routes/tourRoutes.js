@@ -18,7 +18,8 @@ router.route('/monthly-plan/:year ').get(tourController.getMonthlyPlan);
 router
   .route('/')
   // .get(authController.protect, tourController.getAllTours)
-  .get(tourController.getAllTours)
+  // protect runs before getAllTours so if request contains Bearer token only then it returns true
+  .get(authController.protect, tourController.getAllTours)
   .post(tourController.createTour);
 
 router

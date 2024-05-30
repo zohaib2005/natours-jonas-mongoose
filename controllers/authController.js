@@ -16,6 +16,7 @@ const signToken = (id) => {
 
 const createSendToken = (user, statusCode, res) => {
   const token = signToken(user._id);
+  // Cookie is just a small piece of text that a server can send to client then when client received the Cookie it will automatically store it and automatically send it back to all the future requests to the same server where it came from.
   const cookieOptions = {
     expires: new Date(
       Date.now() + process.env.JWT_COOKIE_EXPIRES_IN * 24 * 60 * 60 * 1000,
@@ -25,6 +26,8 @@ const createSendToken = (user, statusCode, res) => {
   };
 
   if (process.env.NODE_ENV === 'production') cookieOptions.secure = true;
+  // its simple to create the Cookie
+  // res.cookie(name of cokie, data need to send, options)
   res.cookie('jwt', token, cookieOptions);
 
   user.password = undefined;
@@ -62,7 +65,9 @@ exports.login = catchAsync(async (req, res, next) => {
   // password field is not selected means it will be hidden on login so we need to use + to access directly from database
   const user = await User.findOne({ email: email }).select('+password');
 
+  // here we are calling instance method from userModel
   if (!user || !(await user.correctPassword(password, user.password))) {
+    // error is wage and not specific for security reasons
     return next(new AppError('Incorrect email or password', 401));
   }
 
@@ -79,6 +84,7 @@ exports.login = catchAsync(async (req, res, next) => {
 exports.protect = catchAsync(async (req, res, next) => {
   // 1) Getting token and check of it's there
   let token;
+  // provide token in Headers tab key Authorization Value "Bearer token"
   if (
     req.headers.authorization &&
     req.headers.authorization.startsWith('Bearer')
@@ -93,8 +99,8 @@ exports.protect = catchAsync(async (req, res, next) => {
   }
 
   // 2) Verification token
+  // if someone manipulated the data or the token has already expired
   const decoded = await promisify(jwt.verify)(token, process.env.JWT_SECRET);
-  console.log(decoded);
 
   // 3) Check if user still exists
   const currentUser = await User.findById(decoded.id);

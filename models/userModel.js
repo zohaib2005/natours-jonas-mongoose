@@ -58,11 +58,13 @@ userSchema.pre('save', async function (next) {
   this.confirmPassword = undefined;
   next();
 });
-
+// Instance methods are the methods that is gonna be available on all the documents of a certain collection
 userSchema.methods.correctPassword = async function (
   candidatePassword,
   userPassword,
 ) {
+  // it will return true if equal and false if not equal
+  // one password is hashed and other is not that's why we need bcrypt compare method
   return bcrypt.compare(candidatePassword, userPassword);
 };
 
@@ -73,6 +75,9 @@ userSchema.methods.changedPasswordAfter = function (JWTTimestamp) {
       10,
     );
     console.log(changedTimestamp, JWTTimestamp);
+    // the day or time The token was issued is less than changed timestamp
+    // false means password is not changed
+    // token should be created after password change
     return JWTTimestamp < changedTimestamp;
   }
   return false;

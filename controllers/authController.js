@@ -21,7 +21,9 @@ const createSendToken = (user, statusCode, res) => {
     expires: new Date(
       Date.now() + process.env.JWT_COOKIE_EXPIRES_IN * 24 * 60 * 60 * 1000,
     ),
+    // secure true means cookie will only be sent to encrypted connections https
     secure: true,
+    // Cookie cannot be modified by browser it prevents cross site scripting attacks
     httpOnly: true,
   };
 
@@ -30,6 +32,7 @@ const createSendToken = (user, statusCode, res) => {
   // res.cookie(name of cokie, data need to send, options)
   res.cookie('jwt', token, cookieOptions);
 
+  // Remove password from output
   user.password = undefined;
 };
 

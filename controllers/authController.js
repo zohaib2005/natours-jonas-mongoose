@@ -1,9 +1,18 @@
 const { promisify } = require('util');
+// Read jsonwebtoken documentation here
+// https://github.com/auth0/node-jsonwebtoken
 const jwt = require('jsonwebtoken');
 const User = require('./../models/userModel');
 const catchAsync = require('./../utils/catchAsync');
 const AppError = require('./../utils/appError');
 const sendEmail = require('./../utils/email');
+
+// You can verify jwt token at https://jwt.io
+const signToken = (id) => {
+  return jwt.sign({ id: id }, process.env.JWT_SECRET, {
+    expiresIn: process.env.JWT_EXPIRES_IN,
+  });
+};
 
 const createSendToken = (user, statusCode, res) => {
   const token = signToken(user._id);
@@ -19,15 +28,10 @@ const createSendToken = (user, statusCode, res) => {
   res.cookie('jwt', token, cookieOptions);
 
   user.password = undefined;
-
-  const signToken = (id) => {
-    return jwt.sign({ id: id }, process.env.JWT_SECRET, {
-      expiresIn: process.env.JWT_EXPIRES_IN,
-    });
-  };
 };
 
 exports.signup = catchAsync(async (req, res, next) => {
+  // We can use User.save in order to update the user
   const newUser = await User.create({
     name: req.body.name,
     email: req.body.email,
@@ -55,6 +59,7 @@ exports.login = catchAsync(async (req, res, next) => {
   }
 
   // 2) Check if user exists && password is correct
+  // password field is not selected means it will be hidden on login so we need to use + to access directly from database
   const user = await User.findOne({ email: email }).select('+password');
 
   if (!user || !(await user.correctPassword(password, user.password))) {

@@ -31,6 +31,7 @@ const userSchema = new mongoose.Schema({
     type: String,
     required: [true, 'Please confirm your password'],
     // we need to use this that's why we are using simple function instead of arrow function
+    // validate will only work on CREATE and SAVE on authController user.create and user.save!!!
     validate: {
       validator: function (el) {
         return el === this.password;
@@ -43,8 +44,11 @@ const userSchema = new mongoose.Schema({
   passwordResetExpires: Date,
 });
 
+// Below is mongoose pre save document middleware
+// Encryption will happen before the moment we receive the data and the moment it actually persisted to the database
+// Between getting the data and saving it to the database
 userSchema.pre('save', async function (next) {
-  // Only run this function if password was actually modifited
+  // Only run this function if password is actually modifited, don't encrypt if email is changed
   if (!this.isModified('password')) return next();
 
   // Hash the password with cost of 12

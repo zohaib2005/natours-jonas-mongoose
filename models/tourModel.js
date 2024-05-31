@@ -103,7 +103,9 @@ const tourSchema = new mongoose.Schema(
         day: Number,
       },
     ],
-    guides: Array,
+    // Modelling tour guides Child Referencing, only ids of users will be saved
+    // and populate will be used in tourController to get users data instead of ids of users
+    guides: [{ type: mongoose.Schema.ObjectId, ref: 'User' }],
   },
   {
     toJSON: { virtuals: true },
@@ -121,12 +123,12 @@ tourSchema.pre('save', function (next) {
   next();
 });
 
-// When creating new tour array of user guides are Embedded
-tourSchema.pre('save', function(next) {
-  this.guidesPromises = this.guides.map(async id => await User.findById(id));
-  this.guides = await Promise.all(this.guidesPromises)
-  next();
-})
+// When creating new tour array of user guides are Embedded into tour
+// tourSchema.pre('save', function(next) {
+//   this.guidesPromises = this.guides.map(async id => await User.findById(id));
+//   this.guides = await Promise.all(this.guidesPromises)
+//   next();
+// })
 
 // tourSchema.pre('save', function (next) {
 //   console.log('Will save document...');
@@ -143,6 +145,15 @@ tourSchema.pre(/^find/, function (next) {
   this.find({ secretTour: { $ne: true } });
   this.start = Date.now();
   next();
+});
+
+// This will work for everything that starts with find
+// Its a query middleware and it will run each time there is a query
+tourSchema.pre(/^find/, function (next) {
+  this.populate({
+    path: 'guides',
+    select: '-__v -passwordChangedAt',
+  });
 });
 
 // AGGREGATION MIDDLEWARE

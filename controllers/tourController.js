@@ -94,8 +94,21 @@ exports.getAllTours = async (req, res) => {
 
 exports.getTour = async (req, res, next) => {
   try {
-    const tour = await Tour.findById(req.params.id);
+    // Below will find single tour
+    // const tour = await Tour.findById(req.params.id);
     // Tour.findOne({ _id: req.params.id })
+
+    // Below will fill up field called guides in our model with actual data instead of just references id's using populate method
+    // This will only be done in query not in actual database
+    // Populate will replace ids with actual data
+    // can comment from here below because also implemented using query middleware in tourModel which will work for all find queries
+    const tour = await Tour.findById(req.params.id).populate('guides');
+
+    // we can also filter remove some properties of populate like below
+    // const tour = await Tour.findById(req.params.id).populate({
+    //   path: 'guides',
+    //   select: '-__v -passwordChangedAt',
+    // });
 
     if (!tour) {
       return next(new AppError('No tour found with that ID', 404));

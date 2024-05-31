@@ -15,6 +15,16 @@ if (process.env.NODE_ENV === 'development') {
   app.use(morgan('dev'));
 }
 
+// rate limiting helps to prevent DOS attack and brute force attack
+// This will allow 100 requests in an hour
+const limiter = rateLimit({
+  max: 100,
+  windowMs: 60 * 60 * 1000,
+  message: 'Too many requests from this IP, please try again in an hour!',
+});
+
+app.use('/api', limiter);
+
 app.use(express.json());
 app.use(express.static(`${__dirname}/public`));
 

@@ -2,6 +2,8 @@ const express = require('express');
 const morgan = require('morgan');
 const rateLimit = require('express-rate-limit');
 const helmet = require('helmet');
+const mongoSanitize = require('express-mongo-sanitize');
+const xss = require('xss-clean');
 
 const AppError = require('./utils/appError');
 const globalErrorHandler = require('./controllers/errorController');
@@ -31,6 +33,15 @@ app.use('/api', limiter);
 
 // Body parser, reading data from body into req.body
 app.use(express.json({ limit: '10kb' }));
+
+// Data sanitization against NoSQL query injection
+// This middleware looks at request body, request query string, and also request.params and it will filter out all the dollar $ signs and dots .
+app.use(mongoSanitize());
+
+// Data sanitization against XSS
+// This will clean any user input from malicious html code
+// Attackers try to insert some malicious html code with some javascript code attached to it and inject into html site and damage our website
+app.use(xss());
 
 // Serving static files
 app.use(express.static(`${__dirname}/public`));
